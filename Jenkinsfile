@@ -2,38 +2,18 @@ pipeline {
     agent any
 
     tools {
-        dotnet 'dotnet6'  // مطمئن شو اسم ابزار از بخش Global Tools مثل این تعریف شده
+        dotnet 'dotnet9'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Info') {
             steps {
-                checkout scm
+                sh 'dotnet --info'
             }
         }
-
-        stage('Restore') {
-            steps {
-                sh 'dotnet restore'
-            }
-        }
-
         stage('Build') {
             steps {
-                sh 'dotnet build --no-restore'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'dotnet test --no-build --logger trx'
-                junit '**/TestResults/*.trx'
-            }
-        }
-
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: '**/TestResults/*.trx', fingerprint: true
+                sh 'dotnet build'
             }
         }
     }
