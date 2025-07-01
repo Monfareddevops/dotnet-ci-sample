@@ -1,19 +1,28 @@
 pipeline {
-    agent any
-
-    tools {
-        dotnet 'dotnet9'
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:6.0'
+            args '-u root:root'
+        }
     }
 
     stages {
-        stage('Info') {
+        stage('Restore') {
             steps {
-                sh 'dotnet --info'
+                sh 'dotnet restore'
             }
         }
+
         stage('Build') {
             steps {
-                sh 'dotnet build'
+                sh 'dotnet build --no-restore'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'dotnet test --no-build --logger "trx;LogFileName=test-results.trx"'
+                junit '**/TestResults/*.trx'
             }
         }
     }
