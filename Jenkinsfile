@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        dotnet 'dotnet9'
+            dotnetsdk 'dotnet9'
     }
 
     stages {
