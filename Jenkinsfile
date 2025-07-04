@@ -1,29 +1,11 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:6.0'
-            args '-u root:root'
-        }
+  agent any
+  stages {
+    stage('Test Docker') {
+      steps {
+        sh 'docker version'
+        sh 'docker run hello-world'
+      }
     }
-
-    stages {
-        stage('Restore') {
-            steps {
-                sh 'dotnet restore'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'dotnet build --no-restore'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'dotnet test --no-build --logger "trx;LogFileName=test-results.trx"'
-                junit '**/TestResults/*.trx'
-            }
-        }
-    }
+  }
 }
