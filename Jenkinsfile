@@ -1,11 +1,40 @@
 pipeline {
-  agent any
-  stages {
-    stage('Test Docker') {
-      steps {
-        sh 'docker version'
-        sh 'docker run hello-world'
-      }
+    agent any
+
+    tools {
+        dotnet 'dotnet6'  // مطمئن شو اسم ابزار از بخش Global Tools مثل این تعریف شده
     }
-  }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Restore') {
+            steps {
+                sh 'dotnet restore'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'dotnet build --no-restore'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'dotnet test --no-build --logger trx'
+                junit '**/TestResults/*.trx'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/TestResults/*.trx', fingerprint: true
+            }
+        }
+    }
 }
